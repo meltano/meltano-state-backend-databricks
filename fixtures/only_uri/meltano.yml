@@ -1,0 +1,8 @@
+requires_meltano: ">=3.7"
+default_environment: dev
+project_id: 1ec76bd8-4499-4bad-a974-b27225d75f12
+send_anonymous_usage_stats: false
+environments:
+- name: dev
+state_backend:
+  uri: databricks://token:test_token@dbc-1234.cloud.databricks.com/test_catalog/test_schema?http_path=/sql/1.0/warehouses/abc123
