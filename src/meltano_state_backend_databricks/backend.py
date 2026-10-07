@@ -238,6 +238,7 @@ class DatabricksStateStoreManager(StateStoreManager):
         prefix = f"{_quote(self.catalog)}." if self.catalog else ""
         self.state_table = f"{prefix}{_quote(self.schema)}.{_quote(self.table_name)}"
         self.lock_table = f"{prefix}{_quote(self.schema)}.{_quote(self.lock_table_name)}"
+        self.schema_qualified = f"{prefix}{_quote(self.schema)}"
 
         self._connection: Connection | None = None
         self._ensure_tables()
@@ -286,8 +287,14 @@ class DatabricksStateStoreManager(StateStoreManager):
         self._connection = value
 
     def _ensure_tables(self) -> None:
-        """Ensure the state and lock tables exist."""
+        """Ensure the schema and the state and lock tables exist."""
         with self.connection.cursor() as cursor:
+            try:
+                cursor.execute(f"CREATE SCHEMA IF NOT EXISTS {self.schema_qualified}")
+            except dbsql.exc.Error as e:
+                # The principal may lack `CREATE SCHEMA` while the schema already
+                # exists. If it doesn't, creating the tables below fails clearly.
+                logger.debug("Could not create schema %s: %s", self.schema_qualified, e)
             cursor.execute(
                 f"""
                 CREATE TABLE IF NOT EXISTS {self.state_table} (
