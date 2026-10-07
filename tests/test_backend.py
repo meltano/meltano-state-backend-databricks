@@ -204,7 +204,7 @@ def test_ensure_tables_schema_creation_denied(
     mock_connection: tuple[mock.Mock, mock.Mock],
 ) -> None:
     _, cursor = mock_connection
-    cursor.execute.side_effect = [DatabaseError("PERMISSION_DENIED"), None, None]
+    cursor.execute.side_effect = [DatabaseError("PERMISSION_DENIED"), None, None]  # type: ignore[no-untyped-call]
     DatabricksStateStoreManager(URI)
     assert len(cursor.execute.call_args_list) == 3
 
