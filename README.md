@@ -31,7 +31,7 @@ To store state in Databricks, set the `state_backend.uri` setting to a URI of th
 databricks://token:<access_token>@<server_hostname>/<catalog>/<schema>?http_path=<http_path>
 ```
 
-State will be stored in two Delta tables that Meltano will create automatically (the catalog and schema must already exist):
+State will be stored in two Delta tables that Meltano will create automatically, along with the schema if it doesn't exist (the catalog must already exist):
 
 - `meltano_state` - Stores the actual state data
 - `meltano_state_locks` - Manages concurrency locks
@@ -81,7 +81,7 @@ state_backend:
 
 - Use environment variables for secrets, e.g. `MELTANO_STATE_BACKEND_DATABRICKS_ACCESS_TOKEN`.
 - Credentials with special characters (e.g. `@`, `%`) must be URL-encoded when included in the URI.
-- The principal needs `USE CATALOG`, `USE SCHEMA`, `CREATE TABLE`, `SELECT` and `MODIFY` on the target schema.
+- The principal needs `USE CATALOG`, `USE SCHEMA`, `CREATE TABLE` (and `CREATE SCHEMA`, to auto-create the schema), `SELECT` and `MODIFY` on the target schema.
 
 ### Locking
 

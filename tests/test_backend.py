@@ -193,10 +193,20 @@ def test_ensure_tables(mock_connection: tuple[mock.Mock, mock.Mock]) -> None:
     _, cursor = mock_connection
     DatabricksStateStoreManager(URI)
     statements = sqls(cursor)
-    assert "CREATE TABLE IF NOT EXISTS `cat`.`sch`.`meltano_state`" in statements[0]
-    assert "USING DELTA" in statements[0]
-    assert "CREATE TABLE IF NOT EXISTS `cat`.`sch`.`meltano_state_locks`" in statements[1]
-    assert "'delta.isolationLevel' = 'Serializable'" in statements[1]
+    assert statements[0] == "CREATE SCHEMA IF NOT EXISTS `cat`.`sch`"
+    assert "CREATE TABLE IF NOT EXISTS `cat`.`sch`.`meltano_state`" in statements[1]
+    assert "USING DELTA" in statements[1]
+    assert "CREATE TABLE IF NOT EXISTS `cat`.`sch`.`meltano_state_locks`" in statements[2]
+    assert "'delta.isolationLevel' = 'Serializable'" in statements[2]
+
+
+def test_ensure_tables_schema_creation_denied(
+    mock_connection: tuple[mock.Mock, mock.Mock],
+) -> None:
+    _, cursor = mock_connection
+    cursor.execute.side_effect = [DatabaseError("PERMISSION_DENIED"), None, None]
+    DatabricksStateStoreManager(URI)
+    assert len(cursor.execute.call_args_list) == 3
 
 
 def test_set_state(subject: tuple[DatabricksStateStoreManager, mock.Mock]) -> None:
