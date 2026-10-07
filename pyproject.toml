@@ -22,7 +22,7 @@ classifiers = [
 ]
 dynamic = [ "version" ]
 dependencies = [
-  "databricks-sdk>=0.145",
+  "databricks-sdk>=0.142",
   "databricks-sql-connector>=4,<5",
   "meltano>=3.7",
   "typing-extensions>=4.15; python_full_version<'3.12'",
